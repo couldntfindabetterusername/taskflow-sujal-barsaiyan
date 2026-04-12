@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ProjectsPage from './pages/ProjectsPage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -60,16 +61,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Placeholder for projects page (will be implemented in Task 9)
-function ProjectsPlaceholder() {
-  return (
-    <div>
-      <h1>Projects</h1>
-      <p>Projects page will be implemented in Task 9</p>
-    </div>
-  );
-}
-
 // Placeholder for project detail page (will be implemented in Task 10)
 function ProjectDetailPlaceholder() {
   return (
@@ -103,7 +94,7 @@ function App() {
               >
                 {/* Nested routes render inside Layout's <Outlet /> */}
                 <Route index element={<Navigate to="/projects" replace />} />
-                <Route path="projects" element={<ProjectsPlaceholder />} />
+                <Route path="projects" element={<ProjectsPage />} />
                 <Route path="projects/:id" element={<ProjectDetailPlaceholder />} />
               </Route>
 
