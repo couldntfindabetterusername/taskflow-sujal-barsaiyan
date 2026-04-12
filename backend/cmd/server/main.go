@@ -41,12 +41,16 @@ func main() {
 
  // Initialize repositories
  userRepo := postgres.NewUserRepository(db)
+ projectRepo := postgres.NewProjectRepository(db)
+ taskRepo := postgres.NewTaskRepository(db)
 
  // Initialize services
  authService := service.NewAuthService(userRepo, cfg.JWTSecret)
+ projectService := service.NewProjectService(projectRepo, taskRepo, userRepo)
 
  // Initialize handlers
  authHandler := handler.NewAuthHandler(authService)
+ projectHandler := handler.NewProjectHandler(projectService)
 
  // Setup router
  r := chi.NewRouter()
@@ -70,8 +74,14 @@ func main() {
  r.Group(func(r chi.Router) {
  r.Use(custommiddleware.AuthMiddleware(authService))
 
- // Future protected endpoints will be added here
- // e.g., projects, tasks
+ // Projects routes
+ r.Route("/projects", func(r chi.Router) {
+ r.Get("/", projectHandler.List)
+ r.Post("/", projectHandler.Create)
+ r.Get("/{id}", projectHandler.Get)
+ r.Patch("/{id}", projectHandler.Update)
+ r.Delete("/{id}", projectHandler.Delete)
+ })
  })
 
  addr := fmt.Sprintf(":%s", cfg.ServerPort)
