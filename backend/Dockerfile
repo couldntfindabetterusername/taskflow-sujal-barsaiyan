@@ -38,6 +38,15 @@ RUN echo '#!/bin/sh' > /root/entrypoint.sh && \
     echo '' >> /root/entrypoint.sh && \
     echo 'echo "Migrations completed successfully!"' >> /root/entrypoint.sh && \
     echo '' >> /root/entrypoint.sh && \
+    echo '# Run seed data' >> /root/entrypoint.sh && \
+    echo 'echo "Running seed data..."' >> /root/entrypoint.sh && \
+    echo 'if [ -f /root/migrations/seed.sql ]; then' >> /root/entrypoint.sh && \
+    echo '  PGPASSWORD=$(echo $DATABASE_URL | sed "s/.*:\/\/.*:\(.*\)@.*/\1/") psql "$DATABASE_URL" -f /root/migrations/seed.sql' >> /root/entrypoint.sh && \
+    echo '  echo "Seed data loaded successfully!"' >> /root/entrypoint.sh && \
+    echo 'else' >> /root/entrypoint.sh && \
+    echo '  echo "No seed.sql found, skipping..."' >> /root/entrypoint.sh && \
+    echo 'fi' >> /root/entrypoint.sh && \
+    echo '' >> /root/entrypoint.sh && \
     echo '# Start the server' >> /root/entrypoint.sh && \
     echo 'echo "Starting TaskFlow server..."' >> /root/entrypoint.sh && \
     echo 'exec ./server' >> /root/entrypoint.sh && \

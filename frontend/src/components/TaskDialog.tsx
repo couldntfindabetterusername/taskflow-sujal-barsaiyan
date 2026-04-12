@@ -111,12 +111,19 @@ export default function TaskDialog({
       return;
     }
 
+    // Convert date string to ISO 8601 format for backend
+    let dueDateISO: string | undefined = undefined;
+    if (dueDate) {
+      // dueDate is in format "YYYY-MM-DD", convert to ISO 8601
+      dueDateISO = `${dueDate}T00:00:00Z`;
+    }
+
     const data: TaskCreateRequest | TaskUpdateRequest = {
       title: title.trim(),
       description: description.trim() || undefined,
       status,
       priority,
-      due_date: dueDate || undefined,
+      due_date: dueDateISO,
     };
 
     await onSubmit(data);

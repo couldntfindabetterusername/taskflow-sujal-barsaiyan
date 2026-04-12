@@ -21,7 +21,7 @@ export default function Layout() {
           flexGrow: 1,
           py: { xs: 2, sm: 3 },
           px: { xs: 1, sm: 2 },
-          backgroundColor: (theme) => theme.palette.grey[50],
+          backgroundColor: (theme) => theme.palette.background.default,
         }}
       >
         <Container maxWidth="lg">
@@ -36,7 +36,7 @@ export default function Layout() {
           py: 2,
           px: 2,
           mt: 'auto',
-          backgroundColor: (theme) => theme.palette.grey[100],
+          backgroundColor: (theme) => theme.palette.background.paper,
           borderTop: (theme) => `1px solid ${theme.palette.divider}`,
         }}
       >
