@@ -160,3 +160,22 @@ func (h *ProjectHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
  w.WriteHeader(http.StatusNoContent)
 }
+
+// GetProjectStats gets statistics for a project
+func (h *ProjectHandler) GetProjectStats(w http.ResponseWriter, r *http.Request) {
+ userID := r.Context().Value("user_id").(string)
+
+ projectID := chi.URLParam(r, "id")
+ if projectID == "" {
+ respondWithError(w, http.StatusBadRequest, "project ID is required")
+ return
+ }
+
+ stats, err := h.projectService.GetProjectStats(r.Context(), projectID, userID)
+ if err != nil {
+ handleServiceError(w, err)
+ return
+ }
+
+ respondWithJSON(w, http.StatusOK, stats)
+}

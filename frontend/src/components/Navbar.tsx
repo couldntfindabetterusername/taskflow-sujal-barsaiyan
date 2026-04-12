@@ -11,18 +11,23 @@ import {
   MenuItem,
   Avatar,
   useMediaQuery,
-  useTheme,
+  Tooltip,
 } from '@mui/material';
+import { useTheme as useMuiTheme } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { mode, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const muiTheme = useMuiTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -73,9 +78,19 @@ export default function Navbar() {
             <Typography variant="body1" color="inherit">
               {user?.name}
             </Typography>
+            <Tooltip title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}>
+              <IconButton
+                onClick={toggleTheme}
+                color="inherit"
+                aria-label="toggle theme"
+                sx={{ mr: 1 }}
+              >
+                {mode === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
+              </IconButton>
+            </Tooltip>
             <Avatar
               sx={{
-                bgcolor: theme.palette.secondary.main,
+                bgcolor: muiTheme.palette.secondary.main,
                 width: 36,
                 height: 36,
                 fontSize: '0.875rem',
@@ -128,7 +143,7 @@ export default function Navbar() {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Avatar
                     sx={{
-                      bgcolor: theme.palette.secondary.main,
+                      bgcolor: muiTheme.palette.secondary.main,
                       width: 24,
                       height: 24,
                       fontSize: '0.75rem',
@@ -138,6 +153,10 @@ export default function Navbar() {
                   </Avatar>
                   <Typography variant="body2">{user?.name}</Typography>
                 </Box>
+              </MenuItem>
+              <MenuItem onClick={() => { toggleTheme(); handleMenuClose(); }}>
+                {mode === 'light' ? <Brightness4Icon sx={{ mr: 1 }} fontSize="small" /> : <Brightness7Icon sx={{ mr: 1 }} fontSize="small" />}
+                {mode === 'light' ? 'Dark Mode' : 'Light Mode'}
               </MenuItem>
               <MenuItem onClick={handleLogout}>
                 <LogoutIcon sx={{ mr: 1 }} fontSize="small" />

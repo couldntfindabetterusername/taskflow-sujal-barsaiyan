@@ -147,3 +147,12 @@ type TaskFilters struct {
  Priority   *TaskPriority `json:"priority,omitempty"`
  AssigneeID *string       `json:"assignee_id,omitempty"`
 }
+
+// ProjectStats represents task statistics for a project
+type ProjectStats struct {
+ ProjectID            string             `json:"project_id"`
+ TotalTasks           int                `json:"total_tasks"`
+ CompletionPercentage float64            `json:"completion_percentage"`
+ ByStatus             map[string]int     `json:"by_status"`
+ ByAssignee           map[string]int     `json:"by_assignee"`
+}

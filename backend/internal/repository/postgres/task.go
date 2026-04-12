@@ -304,3 +304,79 @@ func (r *taskRepository) CountByStatus(ctx context.Context, projectID string, st
 
  return count, nil
 }
+
+// GetProjectStats returns task statistics for a project
+func (r *taskRepository) GetProjectStats(ctx context.Context, projectID string) (*model.ProjectStats, error) {
+ stats := &model.ProjectStats{
+ ProjectID:  projectID,
+ ByStatus:   make(map[string]int),
+ ByAssignee: make(map[string]int),
+ }
+
+ // Get total count and completion percentage
+ var totalCount, doneCount int
+ countQuery := `
+ SELECT
+ COUNT(*) as total,
+ COUNT(CASE WHEN status = 'done' THEN 1 END) as done
+ FROM tasks
+ WHERE project_id = $1
+ `
+ err := r.pool.QueryRow(ctx, countQuery, projectID).Scan(&totalCount, &doneCount)
+ if err != nil {
+ return nil, fmt.Errorf("failed to get task counts: %w", err)
+ }
+
+ stats.TotalTasks = totalCount
+ if totalCount > 0 {
+ stats.CompletionPercentage = float64(doneCount) / float64(totalCount) * 100
+ }
+
+ // Get counts by status
+ statusQuery := `
+ SELECT status, COUNT(*) as count
+ FROM tasks
+ WHERE project_id = $1
+ GROUP BY status
+ `
+ rows, err := r.pool.Query(ctx, statusQuery, projectID)
+ if err != nil {
+ return nil, fmt.Errorf("failed to get status counts: %w", err)
+ }
+ defer rows.Close()
+
+ for rows.Next() {
+ var status string
+ var count int
+ if err := rows.Scan(&status, &count); err != nil {
+ return nil, fmt.Errorf("failed to scan status count: %w", err)
+ }
+ stats.ByStatus[status] = count
+ }
+
+ // Get counts by assignee
+ assigneeQuery := `
+ SELECT
+ COALESCE(assignee_id, 'unassigned') as assignee,
+ COUNT(*) as count
+ FROM tasks
+ WHERE project_id = $1
+ GROUP BY assignee_id
+ `
+ rows, err = r.pool.Query(ctx, assigneeQuery, projectID)
+ if err != nil {
+ return nil, fmt.Errorf("failed to get assignee counts: %w", err)
+ }
+ defer rows.Close()
+
+ for rows.Next() {
+ var assignee string
+ var count int
+ if err := rows.Scan(&assignee, &count); err != nil {
+ return nil, fmt.Errorf("failed to scan assignee count: %w", err)
+ }
+ stats.ByAssignee[assignee] = count
+ }
+
+ return stats, nil
+}

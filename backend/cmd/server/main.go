@@ -83,6 +83,7 @@ func main() {
  r.Get("/{id}", projectHandler.Get)
  r.Patch("/{id}", projectHandler.Update)
  r.Delete("/{id}", projectHandler.Delete)
+ r.Get("/{id}/stats", projectHandler.GetProjectStats)
 
  // Tasks routes nested under projects
  r.Get("/{id}/tasks", taskHandler.List)

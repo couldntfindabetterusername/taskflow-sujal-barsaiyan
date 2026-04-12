@@ -260,3 +260,27 @@ type ProjectDetailResponse struct {
  Project model.ProjectResponse `json:"project"`
  Tasks   []model.TaskResponse  `json:"tasks"`
 }
+
+// GetProjectStats returns statistics for a project
+func (s *ProjectService) GetProjectStats(ctx context.Context, projectID string, userID string) (*model.ProjectStats, error) {
+ // Check if user has access to the project
+ hasAccess, err := s.userHasAccess(ctx, projectID, userID)
+ if err != nil {
+ slog.Error("Failed to check project access", "error", err, "project_id", projectID, "user_id", userID)
+ return nil, fmt.Errorf("failed to check project access: %w", err)
+ }
+ if !hasAccess {
+ slog.Warn("Unauthorized project stats access attempt", "project_id", projectID, "user_id", userID)
+ return nil, fmt.Errorf("%w: you don't have access to this project", errors.ErrUnauthorized)
+ }
+
+ // Get stats from repository
+ stats, err := s.taskRepo.GetProjectStats(ctx, projectID)
+ if err != nil {
+ slog.Error("Failed to get project stats", "error", err, "project_id", projectID)
+ return nil, fmt.Errorf("failed to get project stats: %w", err)
+ }
+
+ slog.Info("Project stats retrieved successfully", "project_id", projectID, "user_id", userID)
+ return stats, nil
+}

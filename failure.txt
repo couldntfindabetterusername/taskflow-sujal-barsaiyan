@@ -1,0 +1,44 @@
+#21 [backend builder 7/7] RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/server
+#21 2.179 internal/service/auth.go:10:2: no required module provides package github.com/golang-jwt/jwt/v5; to add it:
+#21 2.179       go get github.com/golang-jwt/jwt/v5
+#21 2.179 internal/repository/postgres/project.go:8:2: no required module provides package github.com/google/uuid; to add it:
+#21 2.179       go get github.com/google/uuid
+#21 ERROR: process "/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/server" did not complete successfully: exit code: 1
+
+#11 [frontend internal] load build context
+#11 ...
+
+#22 [backend stage-1 2/7] RUN apk --no-cache add ca-certificates postgresql-client
+#22 CANCELED
+
+#11 [frontend internal] load build context
+#11 transferring context: 2.86MB 3.7s done
+#11 CANCELED
+------
+ > [backend builder 7/7] RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/server:
+2.179 internal/service/auth.go:10:2: no required module provides package github.com/golang-jwt/jwt/v5; to add it:
+2.179   go get github.com/golang-jwt/jwt/v5
+2.179 internal/repository/postgres/project.go:8:2: no required module provides package github.com/google/uuid; to add it:
+2.179   go get github.com/google/uuid
+------
+[+] up 0/2
+ - Image taskflow-sujal-barsaiyan-backend  Building                                                                                                       9.5s
+ - Image taskflow-sujal-barsaiyan-frontend Building                                                                                                       9.5s
+Dockerfile:8
+
+--------------------
+
+   6 |     RUN go mod download
+
+   7 |     COPY . .
+
+   8 | >>> RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/server
+
+   9 |
+
+  10 |     # Runtime stage
+
+--------------------
+
+target backend: failed to solve: process "/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/server" did not complete successfully: exit code: 1
+thu-zacg-xhc

@@ -31,4 +31,7 @@ type TaskRepository interface {
 
  // CountByStatus returns the number of tasks with a specific status in a project
  CountByStatus(ctx context.Context, projectID string, status model.TaskStatus) (int, error)
+
+ // GetProjectStats returns task statistics for a project
+ GetProjectStats(ctx context.Context, projectID string) (*model.ProjectStats, error)
 }
