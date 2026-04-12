@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProjectsPage from './pages/ProjectsPage';
+import ProjectDetailPage from './pages/ProjectDetailPage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -61,16 +62,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Placeholder for project detail page (will be implemented in Task 10)
-function ProjectDetailPlaceholder() {
-  return (
-    <div>
-      <h1>Project Detail</h1>
-      <p>Project detail page will be implemented in Task 10</p>
-    </div>
-  );
-}
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -95,7 +86,7 @@ function App() {
                 {/* Nested routes render inside Layout's <Outlet /> */}
                 <Route index element={<Navigate to="/projects" replace />} />
                 <Route path="projects" element={<ProjectsPage />} />
-                <Route path="projects/:id" element={<ProjectDetailPlaceholder />} />
+                <Route path="projects/:id" element={<ProjectDetailPage />} />
               </Route>
 
               {/* Catch-all redirect */}
