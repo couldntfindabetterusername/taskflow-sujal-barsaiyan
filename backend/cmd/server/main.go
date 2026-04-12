@@ -14,6 +14,10 @@ import (
  "github.com/go-chi/chi/v5/middleware"
  "github.com/jackc/pgx/v5/pgxpool"
  "github.com/taskflow/backend/internal/config"
+ "github.com/taskflow/backend/internal/handler"
+ custommiddleware "github.com/taskflow/backend/internal/middleware"
+ "github.com/taskflow/backend/internal/repository/postgres"
+ "github.com/taskflow/backend/internal/service"
 )
 
 func main() {
@@ -35,6 +39,16 @@ func main() {
 
  slog.Info("Successfully connected to database")
 
+ // Initialize repositories
+ userRepo := postgres.NewUserRepository(db)
+
+ // Initialize services
+ authService := service.NewAuthService(userRepo, cfg.JWTSecret)
+
+ // Initialize handlers
+ authHandler := handler.NewAuthHandler(authService)
+
+ // Setup router
  r := chi.NewRouter()
 
  r.Use(middleware.Logger)
@@ -43,7 +57,22 @@ func main() {
  r.Use(middleware.RealIP)
  r.Use(corsMiddleware)
 
+ // Public routes
  r.Get("/health", healthHandler)
+
+ // Auth routes (public)
+ r.Route("/auth", func(r chi.Router) {
+ r.Post("/register", authHandler.Register)
+ r.Post("/login", authHandler.Login)
+ })
+
+ // Protected routes
+ r.Group(func(r chi.Router) {
+ r.Use(custommiddleware.AuthMiddleware(authService))
+
+ // Future protected endpoints will be added here
+ // e.g., projects, tasks
+ })
 
  addr := fmt.Sprintf(":%s", cfg.ServerPort)
  server := &http.Server{
