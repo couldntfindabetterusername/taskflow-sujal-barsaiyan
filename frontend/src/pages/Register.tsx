@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -15,7 +15,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
   const navigate = useNavigate();
-  const { register, isLoading, error, clearError } = useAuth();
+  const { register, isLoading, error, clearError, isAuthenticated } = useAuth();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -27,6 +27,13 @@ export default function Register() {
     password?: string;
     confirmPassword?: string;
   }>({});
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/projects', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const validateForm = (): boolean => {
     const errors: {
@@ -74,7 +81,7 @@ export default function Register() {
 
     try {
       await register({ name, email, password });
-      navigate('/projects');
+      navigate('/projects', { replace: true });
     } catch {
       // Error is handled by AuthContext
     }

@@ -1,5 +1,5 @@
-import { useState, FormEvent } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useState, FormEvent, useEffect } from 'react';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -13,9 +13,16 @@ import {
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 
+interface LocationState {
+  from?: {
+    pathname: string;
+  };
+}
+
 export default function Login() {
   const navigate = useNavigate();
-  const { login, isLoading, error, clearError } = useAuth();
+  const location = useLocation();
+  const { login, isLoading, error, clearError, isAuthenticated } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,6 +30,16 @@ export default function Login() {
     email?: string;
     password?: string;
   }>({});
+
+  // Get the redirect path from location state or default to /projects
+  const from = (location.state as LocationState)?.from?.pathname || '/projects';
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, from]);
 
   const validateForm = (): boolean => {
     const errors: { email?: string; password?: string } = {};
@@ -51,7 +68,7 @@ export default function Login() {
 
     try {
       await login({ email, password });
-      navigate('/projects');
+      navigate(from, { replace: true });
     } catch {
       // Error is handled by AuthContext
     }
