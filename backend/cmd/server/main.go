@@ -47,10 +47,12 @@ func main() {
  // Initialize services
  authService := service.NewAuthService(userRepo, cfg.JWTSecret)
  projectService := service.NewProjectService(projectRepo, taskRepo, userRepo)
+ taskService := service.NewTaskService(taskRepo, projectRepo, userRepo)
 
  // Initialize handlers
  authHandler := handler.NewAuthHandler(authService)
  projectHandler := handler.NewProjectHandler(projectService)
+ taskHandler := handler.NewTaskHandler(taskService)
 
  // Setup router
  r := chi.NewRouter()
@@ -81,6 +83,17 @@ func main() {
  r.Get("/{id}", projectHandler.Get)
  r.Patch("/{id}", projectHandler.Update)
  r.Delete("/{id}", projectHandler.Delete)
+
+ // Tasks routes nested under projects
+ r.Get("/{id}/tasks", taskHandler.List)
+ r.Post("/{id}/tasks", taskHandler.Create)
+ })
+
+ // Tasks routes (standalone for update/delete)
+ r.Route("/tasks", func(r chi.Router) {
+ r.Get("/{id}", taskHandler.Get)
+ r.Patch("/{id}", taskHandler.Update)
+ r.Delete("/{id}", taskHandler.Delete)
  })
  })
 
