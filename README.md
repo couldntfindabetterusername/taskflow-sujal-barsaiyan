@@ -85,7 +85,7 @@ No need to install Go, Node.js, PostgreSQL, or any other dependencies—Docker h
 1. **Clone the repository:**
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/couldntfindabetterusername/taskflow-sujal-barsaiyan.git
 cd "taskflow-sujal-barsaiyan"
 ```
 
